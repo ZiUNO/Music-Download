@@ -19,13 +19,16 @@ class QQMusic(Music):
         super().__init__()
 
     def search(self):
-        if self._name is None:
+        if self._music_name is None:
             raise RuntimeError('未设定音乐名')
         else:
-            encode_name = str(self._name.encode(encoding='utf-8')).upper()[1:]
+            encode_name = str(self._music_name.encode(encoding='utf-8')).upper()[1:]
             music_name_encoded = str('%'.join(encode_name.split('\\X')))[1:-1]
             print('Searching...')
-            url = 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.song&searchid=62681517279281672&t=0&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=1&n=20&w=%s&g_tk=5381&jsonpCallback=MusicJsonCallback24009799704592139&loginUin=0&hostUin=0&format=jsonp&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0' % music_name_encoded
+            url = 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&new_json=1&remoteplace' \
+                  '=txt.yqq.song&searchid=62681517279281672&t=0&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=1&n=20' \
+                  '&w=%s&g_tk=5381&jsonpCallback=MusicJsonCallback24009799704592139&loginUin=0&hostUin=0&format=jsonp' \
+                  '&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0' % music_name_encoded
             page = requests.get(url).text
             media_ids = re.findall('media_mid":"(.*?)","size_128"', page, re.S)
             albummids = []
@@ -47,16 +50,30 @@ class QQMusic(Music):
             sleep(sleep_time)
             print('Getting songmid')
             for albummid in albummids:
-                url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg?albummid=%s&g_tk=5381&jsonpCallback=albuminfoCallback&loginUin=0&hostUin=0&format=jsonp&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0' % albummid
+                url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg?albummid=%s&g_tk=5381&jsonpCallback' \
+                      '=albuminfoCallback&loginUin=0&hostUin=0&format=jsonp&inCharset=utf8&outCharset=utf-8&notice=0' \
+                      '&platform=yqq&needNewCode=0' % albummid
                 page = requests.get(url).text
                 songmids = re.findall('"songmid":"(.*?)",', page, re.S)
                 names = re.findall('"songname":"(.*?)",', page, re.S)
                 singer_name = re.findall('"singername":"(.*?)",', page, re.S)[0]
                 print('Getting purl of %s' % albummid)
                 for songmid_index in range(len(songmids)):
-                    url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?callback=getplaysongvkey7337371457506539&g_tk=5381&jsonpCallback=getplaysongvkey7337371457506539&loginUin=0&hostUin=0&format=jsonp&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&data=%7B%22req%22%3A%7B%22module%22%3A%22CDN.SrfCdnDispatchServer%22%2C%22method%22%3A%22GetCdnDispatch%22%2C%22param%22%3A%7B%22guid%22%3A%222998688000%22%2C%22calltype%22%3A0%2C%22userip%22%3A%22%22%7D%7D%2C%22req_0%22%3A%7B%22module%22%3A%22vkey.GetVkeyServer%22%2C%22method%22%3A%22CgiGetVkey%22%2C%22param%22%3A%7B%22guid%22%3A%222998688000%22%2C%22songmid%22%3A%5B%22' + \
+                    if str(self._music_name).lower() not in str(names[songmid_index]).lower():
+                        continue
+                    url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?callback=getplaysongvkey7337371457506539&g_tk=5381' \
+                          '&jsonpCallback=getplaysongvkey7337371457506539&loginUin=0&hostUin=0&format=jsonp&inCharset' \
+                          '=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&data=%7B%22req%22%3A%7B' \
+                          '%22module%22%3A%22CDN.SrfCdnDispatchServer%22%2C%22method%22%3A%22GetCdnDispatch%22%2C' \
+                          '%22param%22%3A%7B%22guid%22%3A%222998688000%22%2C%22calltype%22%3A0%2C%22userip%22%3A%22' \
+                          '%22%7D%7D%2C%22req_0%22%3A%7B%22module%22%3A%22vkey.GetVkeyServer%22%2C%22method%22%3A' \
+                          '%22CgiGetVkey%22%2C%22param%22%3A%7B%22guid%22%3A%222998688000%22%2C%22songmid%22%3A%5B%22' \
+                          '' + \
                           songmids[
-                              songmid_index] + '%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22uin%22%3A%220%22%2C%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%7D%7D%2C%22comm%22%3A%7B%22uin%22%3A0%2C%22format%22%3A%22json%22%2C%22ct%22%3A20%2C%22cv%22%3A0%7D%7D'
+                              songmid_index] + '%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22uin%22%3A%220%22%2C' \
+                                               '%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%7D%7D%2C%22comm%22%3A' \
+                                               '%7B%22uin%22%3A0%2C%22format%22%3A%22json%22%2C%22ct%22%3A20%2C%22cv' \
+                                               '%22%3A0%7D%7D '
                     page = requests.get(url).text
                     purl = re.findall('"purl":"(.*?)"', page, re.S)[0]
                     if len(purl) == 0:
