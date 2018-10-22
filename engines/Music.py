@@ -18,10 +18,10 @@ class Music(object):
 
     def __del__(self):
         self._data.clear()
-        self._name = None
+        self._music_name = None
 
     def __init__(self):
-        self._name = None
+        self._music_name = None
         self._data = []
 
     @abc.abstractmethod
@@ -29,12 +29,12 @@ class Music(object):
         pass
 
     @property
-    def name(self):
-        return self._name
+    def music_name(self):
+        return self._music_name
 
-    @name.setter
-    def name(self, name):
-        self._name = name
+    @music_name.setter
+    def music_name(self, name):
+        self._music_name = name
 
     def save_source(self):
         if len(self._data) == 0:
@@ -82,7 +82,6 @@ class Music(object):
                     print('failed, please wait a minute...')
                     sleep(randint(30, 50))
                     print('Downloading %s again...' % name, end='')
-
             file = open('Downloads\\%s.m4a' % name, 'wb')
             file.write(music.content)
             sleep(randint(1, 3))
