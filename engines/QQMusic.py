@@ -19,23 +19,30 @@ class QQMusic(Music):
         super().__init__()
 
     def search(self):
+        if self._have_searched():
+            print('%s is in the search log.' % self._music_name)
+            return
+        self._write_save_log()
         if self._music_name is None:
             raise RuntimeError('未设定音乐名')
         else:
             encode_name = str(self._music_name.encode(encoding='utf-8')).upper()[1:]
             music_name_encoded = str('%'.join(encode_name.split('\\X')))[1:-1]
-            print('Searching...')
+            print('Searching begin...')
+            print('Getting media id...', end='')
             url = 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&new_json=1&remoteplace' \
                   '=txt.yqq.song&searchid=62681517279281672&t=0&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=1&n=20' \
                   '&w=%s&g_tk=5381&jsonpCallback=MusicJsonCallback24009799704592139&loginUin=0&hostUin=0&format=jsonp' \
                   '&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0' % music_name_encoded
             page = requests.get(url).text
             media_ids = re.findall('media_mid":"(.*?)","size_128"', page, re.S)
+            print('Done.')
             albummids = []
             sleep_time = randint(3, 20)
-            print('Sleep %s second(s)...' % sleep_time)
+            print('Sleep %s second(s)...' % sleep_time, end='')
             sleep(sleep_time)
-            print('Getting albummids...')
+            print('Done.')
+            print('Getting albummids...', end='')
             for media_id in media_ids:
                 url = 'https://y.qq.com/n/yqq/song/%s.html' % media_id
                 page = requests.get(url).text
@@ -45,21 +52,25 @@ class QQMusic(Music):
                 else:
                     albummids.append(albummid[0])
                     sleep(randint(1, 3))
+            print('Done.')
             sleep_time = randint(3, 20)
-            print('Sleep %s second(s)...' % sleep_time)
+            print('Sleep %s second(s)...' % sleep_time, end='')
             sleep(sleep_time)
-            print('Getting songmid')
+            print('Done.')
+            print('Getting songmid...')
             for albummid in albummids:
                 url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg?albummid=%s&g_tk=5381&jsonpCallback' \
                       '=albuminfoCallback&loginUin=0&hostUin=0&format=jsonp&inCharset=utf8&outCharset=utf-8&notice=0' \
                       '&platform=yqq&needNewCode=0' % albummid
                 page = requests.get(url).text
                 songmids = re.findall('"songmid":"(.*?)",', page, re.S)
-                names = re.findall('"songname":"(.*?)",', page, re.S)
+                music_names = re.findall('"songname":"(.*?)",', page, re.S)
                 singer_name = re.findall('"singername":"(.*?)",', page, re.S)[0]
                 print('Getting purl of %s' % albummid)
                 for songmid_index in range(len(songmids)):
-                    if str(self._music_name).lower() not in str(names[songmid_index]).lower():
+                    if str(self._music_name).lower() not in str(music_names[songmid_index]).lower():
+                        continue
+                    elif self._singer_name is not None and str(self._singer_name).lower() not in str(singer_name):
                         continue
                     url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?callback=getplaysongvkey7337371457506539&g_tk=5381' \
                           '&jsonpCallback=getplaysongvkey7337371457506539&loginUin=0&hostUin=0&format=jsonp&inCharset' \
@@ -79,7 +90,7 @@ class QQMusic(Music):
                     if len(purl) == 0:
                         continue
                     url = 'http://isure.stream.qqmusic.qq.com/' + purl
-                    print('Get link of (%s, %s, %s)' % (names[songmid_index], singer_name, url))
-                    self._data.append([names[songmid_index], singer_name, url])
+                    print('Get link of (%s, %s, %s)' % (music_names[songmid_index], singer_name, url))
+                    self._data.append([music_names[songmid_index], singer_name, url])
                     sleep(randint(1, 3))
             print('Searching completed.')
