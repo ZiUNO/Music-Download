@@ -4,11 +4,19 @@
 * @Software: PyCharm
 * @Time: 2018/10/17 8:48
 """
+from engines.Music import Music
 from engines.QQMusic import QQMusic
 
+# Music.clear_history()
 music = QQMusic()
-music.name = input('音乐名：')
+music.music_name = input('音乐名：')
+music.singer_name = input('歌手名（可选）：')
 music.search()
 music.save_source()
+music_list = music.music_list
+print(music_list)
+for name in music_list:
+    Music.download(name)
+
 del music
 # Music.download_all()

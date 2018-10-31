@@ -20,9 +20,7 @@ class QQMusic(Music):
 
     def search(self):
         if self._have_searched():
-            print('%s is in the search log.' % self._music_name)
             return
-        self._write_save_log()
         if self._music_name is None:
             raise RuntimeError('未设定音乐名')
         else:
@@ -38,10 +36,6 @@ class QQMusic(Music):
             media_ids = re.findall('media_mid":"(.*?)","size_128"', page, re.S)
             print('Done.')
             albummids = []
-            sleep_time = randint(3, 20)
-            print('Sleep %s second(s)...' % sleep_time, end='')
-            sleep(sleep_time)
-            print('Done.')
             print('Getting albummids...', end='')
             for media_id in media_ids:
                 url = 'https://y.qq.com/n/yqq/song/%s.html' % media_id
@@ -52,10 +46,6 @@ class QQMusic(Music):
                 else:
                     albummids.append(albummid[0])
                     sleep(randint(1, 3))
-            print('Done.')
-            sleep_time = randint(3, 20)
-            print('Sleep %s second(s)...' % sleep_time, end='')
-            sleep(sleep_time)
             print('Done.')
             print('Getting songmid...')
             for albummid in albummids:
