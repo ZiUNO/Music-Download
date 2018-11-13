@@ -70,11 +70,11 @@ class QQMusic(Music):
                           '%22%7D%7D%2C%22req_0%22%3A%7B%22module%22%3A%22vkey.GetVkeyServer%22%2C%22method%22%3A' \
                           '%22CgiGetVkey%22%2C%22param%22%3A%7B%22guid%22%3A%222998688000%22%2C%22songmid%22%3A%5B%22' \
                           '' + \
-                          songmids[
-                              songmid_index] + '%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22uin%22%3A%220%22%2C' \
-                                               '%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%7D%7D%2C%22comm%22%3A' \
-                                               '%7B%22uin%22%3A0%2C%22format%22%3A%22json%22%2C%22ct%22%3A20%2C%22cv' \
-                                               '%22%3A0%7D%7D '
+                          songmids[songmid_index] + \
+                          '%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22uin%22%3A%220%22%2C' \
+                          '%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%7D%7D%2C%22comm%22%3A' \
+                          '%7B%22uin%22%3A0%2C%22format%22%3A%22json%22%2C%22ct%22%3A20%2C%22cv' \
+                          '%22%3A0%7D%7D '
                     page = requests.get(url).text
                     purl = re.findall('"purl":"(.*?)"', page, re.S)[0]
                     if len(purl) == 0:

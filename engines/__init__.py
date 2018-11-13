@@ -5,4 +5,4 @@
 * @Time: 2018/10/17 8:51
 """
 
-__all__ = ["QQMusic", "CloudMusic"]
+__all__ = ["QQMusic"]
