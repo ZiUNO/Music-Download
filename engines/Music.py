@@ -151,8 +151,17 @@ class Music(object):
         ws_music.cell(1, 1).value = '# COMMIT MUSIC_NAME SINGER_NAME SOURCE_LINK'
 
         ws_log.cell(1, 1).value = '# COMMIT SOURCE SEARCH LOG'
+        if os.path.exists(r'data\source.xlsx'):
+            try:
+                os.remove(r'data\source.xlsx')
+            except PermissionError:
+                print('请先关闭已打开的source.xlsx文件或解除占用')
+                os.system('pause')
+                os.system('cls')
+                return False
         wb.save(r'data\source.xlsx')
         wb.close()
+        return True
 
     @staticmethod
     def __handle_name(name):

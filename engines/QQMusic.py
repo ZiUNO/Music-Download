@@ -19,6 +19,7 @@ class QQMusic(Music):
         super().__init__()
 
     def search(self):
+        self._data = []
         if self._have_searched():
             return
         if self._music_name is None:
