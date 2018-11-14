@@ -35,6 +35,11 @@ class Music(object):
 
     @staticmethod
     def download(name_to_download, path=r'data\source.xlsx'):
+        """
+        下载指定歌名的音乐文件（该歌曲已在source.xlsx中）
+        :param name_to_download: 要下载的音乐名
+        :param path: 资源日志文件的保存路径
+        """
         print('Begin to download %s' % name_to_download)
         wb = xlrd.open_workbook(path)
         ws = wb.sheet_by_name('music')
@@ -65,9 +70,15 @@ class Music(object):
 
     @abc.abstractmethod
     def search(self):
+        """
+        子类需实现该搜索方法
+        """
         pass
 
     def _write_search_log(self):
+        """
+        记录搜索日志
+        """
         print('Writing save source log...', end='')
         wb = openpyxl.load_workbook(r'data\source.xlsx')
         ws = wb['log']
@@ -80,6 +91,10 @@ class Music(object):
         print('Done.')
 
     def _have_searched(self):
+        """
+        判断该歌曲是否已经搜索过，若搜索过则加载历史记录
+        :return:
+        """
         wb = xlrd.open_workbook(r'data\source.xlsx')
         ws = wb.sheet_by_name('log')
         for row_index in range(1, ws.nrows):
@@ -92,6 +107,11 @@ class Music(object):
         return False
 
     def _load_search_history(self, path=r'data\source.xlsx'):
+        """
+        加载历史搜素记录
+        :param path: 加载资源文件路径
+        :return:
+        """
         if len(self._data) != 0:
             print('Have loaded search history.')
             return
@@ -128,6 +148,10 @@ class Music(object):
         self._music_name = name
 
     def save_source(self):
+        """
+        保存本次搜索的音乐资源信息到data\source.xlsx中
+        :return:
+        """
         if len(self._data) == 0:
             print('暂无数据或已保存资源')
         else:
@@ -145,6 +169,10 @@ class Music(object):
 
     @staticmethod
     def clear_history():
+        """
+        清除历史搜索信息
+        :return:
+        """
         wb = openpyxl.Workbook()
         ws_music = wb.create_sheet('music')
         ws_log = wb.create_sheet('log')
@@ -165,6 +193,11 @@ class Music(object):
 
     @staticmethod
     def __handle_name(name):
+        """
+        Windows操作系统命名规则，对非法文件名字符进行替换
+        :param name:
+        :return:
+        """
         name = list(name)
         illegal_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
         for index in range(len(name)):
@@ -174,6 +207,10 @@ class Music(object):
 
     @staticmethod
     def download_all(path=r'data\source.xlsx'):
+        """
+        下载所有的搜索过的音乐曲目
+        :param path: 搜索过的音乐曲目资源信息保存的路径
+        """
         print('Begin to download...')
         wb = xlrd.open_workbook(path)
         ws = wb.sheet_by_name('music')
